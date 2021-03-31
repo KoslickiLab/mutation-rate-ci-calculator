@@ -3,9 +3,9 @@
 This software calculates a confidence interval for the mutation rate from
 a set of observed containment indices under a simple nucleotide mutation process.
 In this model, a sequence B evolves from a sequence A by independently mutating 
-every nucleotide with probability p. We then observe the scaled containment indices
+every nucleotide with probability `p`. We then observe the scaled containment indices
 as a result of the mutation process. The software then generates a confidence interval
-for the mutation rate p.
+for the mutation rate `p`.
 
 ### Quick start
 
@@ -16,20 +16,28 @@ L       k       conf    Cks     CLow    CHigh   pLow    pHigh
 100000  21      0.95    0.10605 0.10046 0.11191 0.09623 0.10655
 ```
 
+#### Output
+In the example above, the `L`, `k`, `conf`, and `Cks` values are the input number of k-mers, k-mer size, 
+desired confidence level, and observed scaled MinHash value respectively. The `CLow`
+and `CHigh` give the left and right 95% confidence interval around the true containment
+value. The `pLow` and `pHigh` give a confidence interval that is at least as wide as the
+95% confidence interval around the true mutation rate `p`. Note that average nucleotide
+identity (ANI) is equal to `1-p`.
+
 ### How to choose L and other parameters
 In reality, you may not know L. In such cases, we recommend that you estimate
 it from what you know. For example, if what you know is that the number of
-distinct (i.e. counting duplicates only once) k-mers in A is nA and in B is nB,
-then you can set L = (nA + nB) / 2. You can also try setting L = min(nA, nB) or
-L = max(nA, nB).   
+distinct (i.e. counting duplicates only once) k-mers in A is `nA` and in B is `nB`,
+then you can set `L = (nA + nB) / 2`. You can also try setting `L = min(nA, nB)` or
+`L = max(nA, nB)`.   
 
-You may also want to get a confidence interval on r<sub>1</sub> from the number
-of mutated k-mers N, but you might only known the number of shared k-mers, i.e.
-the number of k-mers in both A and B. If this number is n, then you can set
-N = L - n.
+You may also want to get a confidence interval on `p` from the number
+of mutated k-mers `N`, but you might only known the number of shared k-mers, i.e.
+the number of k-mers in both A and B. If this number is `n`, then you can set
+`N = L - n`.
 
-Note that the programs consider L (uppercase) as the number of kmers in the
-sequence, and l (lowercase) as the number of nucleotides, with l = L + k-1.
+Note that the programs consider `L` (uppercase) as the number of kmers in the
+sequence, and `l` (lowercase) as the number of nucleotides, with `l = L + k-1`.
 
 ### Prerequisites
 
@@ -57,15 +65,11 @@ simulate_nucleotide_errors are not available.
 p-from-scaled-containment.py
 
 ```bash  
-Compute confidence interval for the mutation rate r1, given the observed number
-of mutated k-mers.
-
-Compute confidence interval for the mutation rate p, given the observed number
-of mutated k-mers.
+Compute confidence interval for the mutation rate p, given the observed scaled MinHash value.
 
 usage: p-from-scaled-containment.py [options]
-  --sccon=<list>              (Cks=) (cumulative) observed number of mutated
-                              k-mers; <list> is a comma-separated list of
+  --sccon=<list>              (Cks=) (cumulative) observed scaled MinHash
+                              value; <list> is a comma-separated list of
                               numbers
   --scale=<probability>       (s=) scaling factor of the hash
   
