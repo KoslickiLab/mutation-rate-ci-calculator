@@ -44,7 +44,7 @@ def main():
     global reportProgress,debug
     # parse the command line
     scaledContainmentsObserverved  = []
-    scaleFactor = 0.1 #default 
+    scaleFactor        = 0.1 #default 
     ntSequenceLength   = None
     kmerSequenceLength = None
     kmerSize           = 21
