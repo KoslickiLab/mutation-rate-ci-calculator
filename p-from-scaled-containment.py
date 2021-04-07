@@ -8,7 +8,11 @@ from scipy.optimize import brentq, fsolve, newton
 from scipy.stats import norm as scipy_norm
 from numpy import sqrt
 
-
+try:
+	from mpmath import mp as mpmath,mpf
+	mpmath.dps = 50
+except ModuleNotFoundError:
+	mpf = lambda v:float(v)
 
 def usage(s=None):
     message = """
@@ -107,21 +111,39 @@ def main():
     print("\t".join(header))
     z_alpha = probit(1-alpha/2)
     f1 = lambda Nm: 1-1.0*Nm/L + z_alpha*sqrt( 1.0*Nm*(L-Nm)*(1-s)/(s * L**3) ) - Cks
+    f1_mpf = lambda Nm: mpf(f1(Nm))
     f2 = lambda Nm: 1-1.0*Nm/L - z_alpha*sqrt( 1.0*Nm*(L-Nm)*(1-s)/(s * L**3) ) - Cks
+    f2_mpf = lambda Nm: mpf(f2(Nm))
     
     for (CksIx,Cks) in enumerate(scaledContainmentsObserverved):
         Nm_guess = L*(1-Cks)
-        sol1 = newton(f1, Nm_guess)
-        sol2 = newton(f2, Nm_guess)
+        sol1_mpf = newton(f1_mpf, Nm_guess)
+        sol2_mpf = newton(f2_mpf, Nm_guess)
+        
+        #print( sol1, f1(sol1) )
+        #print( float(sol1_new), float(f1_new(float(sol1_new))) )
+        #print( float(sol1_new), float(f1(sol1_new)) )
+        #print( sol1_mpf, f1_mpf(sol1_mpf) )
+        #print( sol2, f2(sol2) )
+        #print( sol2_mpf, f2_mpf(sol2_mpf) )
+        
+        sol1 = sol1_mpf
+        sol2 = sol2_mpf
         
         Clow = 1-1.0*sol1/L
         Chigh = 1-1.0*sol2/L
         
-        f3 = lambda pest: (1-pest)**k + z_alpha*sqrt( thm5.var_n_mutated(L,k,pest) ) / L - Clow
-        f4 = lambda pest: (1-pest)**k - z_alpha*sqrt( thm5.var_n_mutated(L,k,pest) ) / L - Chigh
+        f3 = lambda pest: mpf((1-pest)**k + z_alpha*sqrt( thm5.var_n_mutated(L,k,pest) ) / L - Clow)
+        f4 = lambda pest: mpf((1-pest)**k - z_alpha*sqrt( thm5.var_n_mutated(L,k,pest) ) / L - Chigh)
         
-        phigh = brentq(f3, 0.0001, 0.95)
-        plow = brentq(f4, 0.0001, 0.95)
+        phigh = newton(f3, Clow)
+        plow = newton(f4, Chigh)
+        
+        #phigh = brentq(f3, 0.0001, 0.95)
+        #plow = brentq(f4, 0.0001, 0.95)
+        
+        #print(phigh, f3(phigh))
+        #print(plow, f4(plow))
         
         values = [L,k,confidence,Cks,Clow,Chigh,plow,phigh]
         print("\t".join(str(v)[:7] for v in values))
