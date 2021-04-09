@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-from sys  import argv,exit
 from math import ceil
 import kmer_mutation_formulas_thm5 as thm5
 import hypergeometric_slicer as hgslicer
@@ -21,13 +20,14 @@ except ModuleNotFoundError:
 def probit(p):
     return scipy_norm.ppf(p)
 
-def compute_confidence_intervals(L, k, alpha, s, debug=False):
+def compute_confidence_intervals(scaledContainmentsObserverved, L, k, alpha, s, debug=False):
     z_alpha = probit(1-alpha/2)
     f1 = lambda Nm: 1-1.0*Nm/L + z_alpha*sqrt( 1.0*Nm*(L-Nm)*(1-s)/(s * L**3) ) - Cks
     f1_mpf = lambda Nm: mpf(f1(Nm))
     f2 = lambda Nm: 1-1.0*Nm/L - z_alpha*sqrt( 1.0*Nm*(L-Nm)*(1-s)/(s * L**3) ) - Cks
     f2_mpf = lambda Nm: mpf(f2(Nm))
 
+    all_results = []
     for (CksIx,Cks) in enumerate(scaledContainmentsObserverved):
         Nm_guess = L*(1-Cks)
         sol1_mpf = newton(f1_mpf, Nm_guess)
@@ -59,13 +59,16 @@ def compute_confidence_intervals(L, k, alpha, s, debug=False):
         #print(plow, f4(plow))
 
         values = [L,k,confidence,Cks,Clow,Chigh,plow,phigh]
-        return values
+        all_results.append(values)
+    return values
 
-def main():
+def main(args):
     global reportProgress,debug
 
     # parse the command line
-
+    scaledContainmentsObserverved= []
+    ntSequenceLength=None
+    kmerSequenceLength=None
     scaledContainmentsObserverved += list(map(parse_probability, args.sccon))
     if args.length:
         ntSequenceLength = int_with_unit(args.length)
@@ -107,12 +110,13 @@ def main():
     k = kmerSize
     alpha = 1 - confidence
     s = scaleFactor
-    conf_intervals = compute_confidence_intervals(L,k,alpha,s)
+    conf_intervals = compute_confidence_intervals(scaledContainmentsObserverved,L,k,alpha,s)
 
     #write results
     header = ["L","k","conf","Cks","CLow","CHigh","pLow","pHigh"]
     print("\t".join(header))
-    print("\t".join(str(v)[:7] for v in values))
+    for values in conf_intervals:
+        print("\t".join(str(v)[:7] for v in values))
 
 
 # parse_probability--
@@ -168,7 +172,7 @@ def cmdline(sys_args):
     seqlen_info.add_argument("--length", type=int, help="number of nucleotides in the sequence") #default=1000000
     seqlen_info.add_argument("-L", "--num-unique-kmers", help="number of unique k-mers in the sequence")
     # optional arguments
-    p.add_argument("--scaled", type=int, help="scaling factor of the sketch")
+    p.add_argument("--scaled", help="scaling factor of the sketch", required=True)
     p.add_argument("-k", "--ksize", type=int, default=21, help="kmer size")
     p.add_argument("-c", "--confidence", default=0.95, help="size of confidence interval, (value between 0 and 1)") # type=float would constrain to float
     p.add_argument("-s", "--seed", type=int, help="random seed for simulations")
