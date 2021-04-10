@@ -79,10 +79,10 @@ def main(args):
     confidence = parse_probability(args.confidence)
     prngSeed = args.seed # not used anywhere?
     debug = []
-    if args.debug:
-        debug = ["debug"]
     if args.debug_options:
-       debug += args.debug_options
+       debug = ["debug"] + args.debug_options
+    elif args.debug:
+        debug = ["debug"]
 
     # check for necessary info
     if (ntSequenceLength != None) and (kmerSequenceLength != None):
@@ -168,7 +168,7 @@ def int_with_unit(s):
 def cmdline(sys_args):
     "Command line entry point w/argparse action."
     p = argparse.ArgumentParser(description="Compute confidence interval for the mutation rate p, given the observed number of mutated k-mers")
-    p.add_argument("--sccon", nargs="+", help="observed number of mutated k-mers", required=True) # at least one observation is required
+    p.add_argument("--sccon", nargs="+", help="observed MinHash Containment (input one or more values, separated by a space)", required=True) # at least one observation is required
 
     # add # nucleotides and the # of unique k-mers as a mutually exclusive group, with one (and only one) required
     seqlen_info = p.add_mutually_exclusive_group(required=True) #, help="nucleotide and kmer sequence lengths are inconsistent\nyou only need to specify one of them")
@@ -180,7 +180,8 @@ def cmdline(sys_args):
     p.add_argument("-c", "--confidence", default=0.95, help="size of confidence interval, (value between 0 and 1)") # type=float would constrain to float
     p.add_argument("-s", "--seed", type=int, help="random seed for simulations")
     p.add_argument("--debug", action="store_true", help="debug")
-    p.add_argument("--debug_options", nargs="*", help="additional options for debugging ('nocache', 'nojmonotonicity', 'nsanity')")
+    #p.add_argument("--debug_options", nargs="*", help="additional options for debugging ('nocache', 'nojmonotonicity', 'nsanity'). Enter one or more options (separated by a space)")
+    p.add_argument("--debug_options", nargs="*", choices = ['nocache', 'nojmonotonicity', 'nsanity'], help="Specify one or more debugging options, separated by a space")
     args = p.parse_args()
     return main(args)
 
