@@ -124,18 +124,21 @@ def main(args):
 
 def parse_probability(s,strict=True):
     scale = 1.0
-    if (s.endswith("%")):
-        scale = 0.01
-        s = s[:-1]
-    try:
-        p = float(s)
-    except:
+    if not isinstance(s, float):
+        if (s.endswith("%")):
+            scale = 0.01
+            s = s[:-1]
         try:
-            (numer,denom) = s.split("/",1)
-            p = float(numer)/float(denom)
+            p = float(s)
         except:
-            raise ValueError
-    p *= scale
+            try:
+                (numer,denom) = s.split("/",1)
+                p = float(numer)/float(denom)
+            except:
+                raise ValueError
+        p *= scale
+    else:
+        p=s
     if (strict) and (not 0.0 <= p <= 1.0):
         raise ValueError
     return p
@@ -172,7 +175,7 @@ def cmdline(sys_args):
     seqlen_info.add_argument("--length", type=int, help="number of nucleotides in the sequence") #default=1000000
     seqlen_info.add_argument("-L", "--num-unique-kmers", help="number of unique k-mers in the sequence")
     # optional arguments
-    p.add_argument("--scaled", help="scaling factor of the sketch", required=True)
+    p.add_argument("--scaled", help="scaling factor of the sketch", default=0.1)
     p.add_argument("-k", "--ksize", type=int, default=21, help="kmer size")
     p.add_argument("-c", "--confidence", default=0.95, help="size of confidence interval, (value between 0 and 1)") # type=float would constrain to float
     p.add_argument("-s", "--seed", type=int, help="random seed for simulations")
