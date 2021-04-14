@@ -10,8 +10,9 @@ for the mutation rate `p`.
 ### Quick start
 
 To compute a p confidence interval from an observed number of scaled containment indices:
-```bash 
-$ p-from-scaled-containment.py L=100K k=21 C=0.95 Cks=0.10605
+
+```bash
+python ./p-from-scaled-containment.py -L 100K -k 21 -c 0.95 --sccon 0.10605
 L       k       conf    Cks     CLow    CHigh   pLow    pHigh
 100000  21      0.95    0.10605 0.10046 0.11191 0.09623 0.10655
 ```
@@ -62,26 +63,25 @@ simulate_nucleotide_errors are not available.
 
 ### Usage Details
 
-p-from-scaled-containment.py
+python p-from-scaled-containment.py
 
-```bash  
-Compute confidence interval for the mutation rate p, given the observed scaled MinHash value.
+```bash
+Compute confidence interval for the mutation rate p, given the observed number of mutated k-mers
 
-usage: p-from-scaled-containment.py [options]
-  --sccon=<list>              (Cks=) (cumulative) observed scaled MinHash
-                              value; <list> is a comma-separated list of
-                              numbers
-  --scale=<probability>       (s=) scaling factor of the hash
-  
-  --length=<N>                (l=) sequence length (number of NUCLEOTIDES in
-                              the sequence)
-                              (default is 1000 plus kmer size minus 1)
-  L=<N>                       (L=) sequence length (number of KMERS in
-                              the sequence)
-                              (default is 1000000)
-  --k=<N>                     (K=) kmer size
-                              (default is 21)
-  --confidence=<probability>  (C=) size of confidence interval
-                              (default is 95%)
-  --seed=<string>             random seed for simulations
+optional arguments:
+  -h, --help            show this help message and exit
+  --sccon SCCON [SCCON ...]
+                        observed MinHash Containment (input one or more values, separated by a space)
+  --length LENGTH       number of nucleotides in the sequence
+  -L NUM_UNIQUE_KMERS, --num-unique-kmers NUM_UNIQUE_KMERS
+                        number of unique k-mers in the sequence
+  --scaled SCALED       scaling factor of the sketch
+  -k KSIZE, --ksize KSIZE
+                        kmer size
+  -c CONFIDENCE, --confidence CONFIDENCE
+                        size of confidence interval, (value between 0 and 1)
+  -s SEED, --seed SEED  random seed for simulations
+  --debug               debug
+  --debug_options [{nocache,nojmonotonicity,nsanity} [{nocache,nojmonotonicity,nsanity} ...]]
+                        Specify one or more debugging options, separated by a space
 ```
