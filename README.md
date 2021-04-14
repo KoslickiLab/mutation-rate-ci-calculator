@@ -7,12 +7,46 @@ every nucleotide with probability `p`. We then observe the scaled containment in
 as a result of the mutation process. The software then generates a confidence interval
 for the mutation rate `p`.
 
+### Install (requires conda or mamba)
+
+We recommend installation within an isolated `conda` environment. You can create
+a conda environment with all dependencies installed like so:
+
+1. `git clone` this repo and `cd` in:
+
+```
+git clone https://github.com/KoslickiLab/mutation-rate-ci-calculator
+cd mutation-rate-ci-calculator
+```
+
+2. Use `conda` or `mamba` to create the `mrcc` environment with all dependencies installed:
+
+```
+conda env create --file environment.yml
+```
+> If you have `mamba` installed, feel free to use it here to speed things up.
+> If you haven't installed `conda` or `mamba`, install it first via
+> [Miniforge](https://github.com/conda-forge/miniforge#mambaforge) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html).
+
+
+3. Activate the virtual environment and install this software with pip:
+```
+conda activate mrcc
+pip install -e '.'
+```
+
+You should now be able to run the help for p_from_scaled_containment:
+
+```
+python -m mutation_rate_ci_calculator.p_from_scaled_containment --help
+```
+
 ### Quick start
 
 To compute a p confidence interval from an observed number of scaled containment indices:
 
 ```bash
-python ./p-from-scaled-containment.py -L 100K -k 21 -c 0.95 --sccon 0.10605
+python -m mutation_rate_ci_calculator.p_from_scaled_containment -L 100K -k 21 -c 0.95 --sccon 0.10605
 L       k       conf    Cks     CLow    CHigh   pLow    pHigh
 100000  21      0.95    0.10605 0.10046 0.11191 0.09623 0.10655
 ```

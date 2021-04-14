@@ -1,0 +1,14 @@
+name: mrcc
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python>=3.6
+  - scipy=1.1.0
+  - numpy=1.12.1
+  - mpmath=1.0.0
+  - mmh3
+  - pip
+  #- pip: # this can install latest version directly from github
+  #  - git+https://github.com/KoslickiLab/mutation-rate-ci-calculator@latest

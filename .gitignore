@@ -1,2 +1,6 @@
 *__pycache__
 *pyc
+*.eggs/
+*.egg-info/
+*__pycache__
+*/version.py
