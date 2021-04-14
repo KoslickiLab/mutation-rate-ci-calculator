@@ -38,7 +38,7 @@ pip install -e '.'
 You should now be able to run the help for p_from_scaled_containment:
 
 ```
-python -m mutation_rate_ci_calculator.p_from_scaled_containment --help
+python -m mrcc.p_from_scaled_containment --help
 ```
 
 ### Quick start
