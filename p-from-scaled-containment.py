@@ -7,14 +7,13 @@ import hypergeometric_slicer as hgslicer
 from scipy.optimize import brentq, fsolve, newton
 from scipy.stats import norm as scipy_norm
 from numpy import sqrt
-
 import argparse
 
 try:
-	from mpmath import mp as mpmath,mpf
-	mpmath.dps = 50
+    from mpmath import mp as mpmath,mpf
+    mpmath.dps = 50
 except ModuleNotFoundError:
-	mpf = lambda v:float(v)
+    mpf = lambda v:float(v)
 
 
 def probit(p):
@@ -67,7 +66,7 @@ def main(args):
     global reportProgress,debug
 
     # parse the command line
-    scaledContainmentsObserverved= []
+    scaledContainmentsObserverved=[]
     ntSequenceLength=None
     kmerSequenceLength=None
     scaledContainmentsObserverved += list(map(parse_probability, args.sccon))
@@ -86,13 +85,10 @@ def main(args):
         debug = ["debug"]
 
     # check for necessary info
-    if (ntSequenceLength != None) and (kmerSequenceLength != None):
-        if (kmerSequenceLength != ntSequenceLength + kmerSize-1):
-            usage("nucleotide and kmer sequence lengths are inconsistent\nyou only need to specify one of them")
-    elif (kmerSequenceLength != None):
+    if (kmerSequenceLength != None):
         ntSequenceLength = kmerSequenceLength + (kmerSize-1)
-    elif (ntSequenceLength == None):
-        ntSequenceLength = 100000 + (kmerSize-1)
+    elif (ntSequenceLength != None):
+        kmerSequenceLength = ntSequenceLength - (kmerSize-1)
 
     # handle debugging options:
     if ("nocache" in debug):
@@ -105,10 +101,8 @@ def main(args):
         hgslicer.doNLowSanityCheck  = True
         hgslicer.doNHighSanityCheck = True
 
-
     # compute the confidence interval(s)
-    L = ntSequenceLength - (kmerSize-1)
-    conf_intervals = compute_confidence_intervals(scaledContainmentsObserverved,L,kmerSize,confidence,scaleFactor)
+    conf_intervals = compute_confidence_intervals(scaledContainmentsObserverved,kmerSequenceLength,kmerSize,confidence,scaleFactor)
 
     #write results
     header = ["L","k","conf","Cks","CLow","CHigh","pLow","pHigh"]
@@ -118,7 +112,7 @@ def main(args):
 
 
 # parse_probability--
-#	Parse a string as a probability
+#    Parse a string as a probability
 
 def parse_probability(s,strict=True):
     scale = 1.0
@@ -146,20 +140,20 @@ def parse_probability(s,strict=True):
 # Parse a string as an integer, allowing unit suffixes
 
 def int_with_unit(s):
-	if (s.endswith("K")):
-		multiplier = 1000
-		s = s[:-1]
-	elif (s.endswith("M")):
-		multiplier = 1000 * 1000
-		s = s[:-1]
-	elif (s.endswith("G")):
-		multiplier = 1000 * 1000 * 1000
-		s = s[:-1]
-	else:
-		multiplier = 1
+    if (s.upper().endswith("K")):
+        multiplier = 1000
+        s = s[:-1]
+    elif (s.upper().endswith("M")):
+        multiplier = 1000 * 1000
+        s = s[:-1]
+    elif (s.upper().endswith("G")):
+        multiplier = 1000 * 1000 * 1000
+        s = s[:-1]
+    else:
+        multiplier = 1
 
-	try:               return          int(s)   * multiplier
-	except ValueError: return int(ceil(float(s) * multiplier))
+    try:               return          int(s)   * multiplier
+    except ValueError: return int(ceil(float(s) * multiplier))
 
 
 
@@ -169,8 +163,8 @@ def cmdline(sys_args):
     p.add_argument("--sccon", nargs="+", help="observed MinHash Containment (input one or more values, separated by a space)", required=True) # at least one observation is required
 
     # add # nucleotides and the # of unique k-mers as a mutually exclusive group, with one (and only one) required
-    seqlen_info = p.add_mutually_exclusive_group(required=True) #, help="nucleotide and kmer sequence lengths are inconsistent\nyou only need to specify one of them")
-    seqlen_info.add_argument("--length", type=int, help="number of nucleotides in the sequence") #default=1000000
+    seqlen_info = p.add_mutually_exclusive_group(required=True)
+    seqlen_info.add_argument("--length", help="number of nucleotides in the sequence")
     seqlen_info.add_argument("-L", "--num-unique-kmers", help="number of unique k-mers in the sequence")
     # optional arguments
     p.add_argument("--scaled", help="scaling factor of the sketch", default=0.1)
@@ -178,7 +172,6 @@ def cmdline(sys_args):
     p.add_argument("-c", "--confidence", default=0.95, help="size of confidence interval, (value between 0 and 1)") # type=float would constrain to float
     p.add_argument("-s", "--seed", type=int, help="random seed for simulations")
     p.add_argument("--debug", action="store_true", help="debug")
-    #p.add_argument("--debug_options", nargs="*", help="additional options for debugging ('nocache', 'nojmonotonicity', 'nsanity'). Enter one or more options (separated by a space)")
     p.add_argument("--debug_options", nargs="*", choices = ['nocache', 'nojmonotonicity', 'nsanity'], help="Specify one or more debugging options, separated by a space")
     args = p.parse_args()
     return main(args)
