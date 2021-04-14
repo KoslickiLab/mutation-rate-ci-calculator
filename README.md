@@ -46,7 +46,7 @@ python -m mrcc.p_from_scaled_containment --help
 To compute a p confidence interval from an observed number of scaled containment indices:
 
 ```bash
-python -m mutation_rate_ci_calculator.p_from_scaled_containment -L 100K -k 21 -c 0.95 --sccon 0.10605
+python -m mrcc.p_from_scaled_containment -L 100K -k 21 -c 0.95 --sccon 0.10605
 L       k       conf    Cks     CLow    CHigh   pLow    pHigh
 100000  21      0.95    0.10605 0.10046 0.11191 0.09623 0.10655
 ```
