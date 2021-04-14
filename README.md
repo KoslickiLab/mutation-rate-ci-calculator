@@ -7,7 +7,7 @@ every nucleotide with probability `p`. We then observe the scaled containment in
 as a result of the mutation process. The software then generates a confidence interval
 for the mutation rate `p`.
 
-### Install (requires conda or mamba)
+### Install (requires `conda` or `mamba`)
 
 We recommend installation within an isolated `conda` environment. You can create
 a conda environment with all dependencies installed like so:
