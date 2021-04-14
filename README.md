@@ -12,7 +12,7 @@ for the mutation rate `p`.
 To compute a p confidence interval from an observed number of scaled containment indices:
 
 ```bash
-p-from-scaled-containment.py -L 100K -k 21 -c 0.95 --sccon 0.10605
+python ./p-from-scaled-containment.py -L 100K -k 21 -c 0.95 --sccon 0.10605
 L       k       conf    Cks     CLow    CHigh   pLow    pHigh
 100000  21      0.95    0.10605 0.10046 0.11191 0.09623 0.10655
 ```

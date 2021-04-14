@@ -20,7 +20,8 @@ except ModuleNotFoundError:
 def probit(p):
     return scipy_norm.ppf(p)
 
-def compute_confidence_intervals(scaledContainmentsObserverved, L, k, alpha, s, debug=False):
+def compute_confidence_intervals(scaledContainmentsObserverved, L, k, confidence, s, debug=False):
+    alpha = 1 - confidence
     z_alpha = probit(1-alpha/2)
     f1 = lambda Nm: 1-1.0*Nm/L + z_alpha*sqrt( 1.0*Nm*(L-Nm)*(1-s)/(s * L**3) ) - Cks
     f1_mpf = lambda Nm: mpf(f1(Nm))
@@ -60,7 +61,7 @@ def compute_confidence_intervals(scaledContainmentsObserverved, L, k, alpha, s, 
 
         values = [L,k,confidence,Cks,Clow,Chigh,plow,phigh]
         all_results.append(values)
-    return values
+    return all_results
 
 def main(args):
     global reportProgress,debug
@@ -107,10 +108,7 @@ def main(args):
 
     # compute the confidence interval(s)
     L = ntSequenceLength - (kmerSize-1)
-    k = kmerSize
-    alpha = 1 - confidence
-    s = scaleFactor
-    conf_intervals = compute_confidence_intervals(scaledContainmentsObserverved,L,k,alpha,s)
+    conf_intervals = compute_confidence_intervals(scaledContainmentsObserverved,L,kmerSize,confidence,scaleFactor)
 
     #write results
     header = ["L","k","conf","Cks","CLow","CHigh","pLow","pHigh"]
