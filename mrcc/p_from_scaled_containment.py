@@ -2,8 +2,8 @@
 
 import sys
 from math import ceil
-import kmer_mutation_formulas_thm5 as thm5
-import hypergeometric_slicer as hgslicer
+import mrcc.kmer_mutation_formulas_thm5 as thm5
+import mrcc.hypergeometric_slicer as hgslicer
 from scipy.optimize import brentq, fsolve, newton
 from scipy.stats import norm as scipy_norm
 from numpy import sqrt
