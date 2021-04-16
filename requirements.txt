@@ -1,2 +1,5 @@
-scipy
-numpy
+scipy=1.1.0
+numpy=1.12.1
+mpmath=1.0.0
+mmh3
+
