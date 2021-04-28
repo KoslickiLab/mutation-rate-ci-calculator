@@ -97,7 +97,7 @@ simulate_nucleotide_errors are not available.
 
 ### Usage Details
 
-python p-from-scaled-containment.py
+python -m mrcc.p-from-scaled-containment.py
 
 ```bash
 Compute confidence interval for the mutation rate p, given the observed number of mutated k-mers
