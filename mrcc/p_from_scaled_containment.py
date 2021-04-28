@@ -49,11 +49,11 @@ def compute_confidence_intervals(scaledContainmentsObserverved, L, k, confidence
         f3 = lambda pest: mpf((1-pest)**k + z_alpha*sqrt( thm5.var_n_mutated(L,k,pest) ) / L - Clow)
         f4 = lambda pest: mpf((1-pest)**k - z_alpha*sqrt( thm5.var_n_mutated(L,k,pest) ) / L - Chigh)
 
-        phigh = newton(f3, Clow)
-        plow = newton(f4, Chigh)
+        #phigh = newton(f3, Clow)
+        #plow = newton(f4, Chigh)
 
-        #phigh = brentq(f3, 0.0001, 0.95)
-        #plow = brentq(f4, 0.0001, 0.95)
+        phigh = brentq(f3, 0.01, 0.99)
+        plow = brentq(f4, 0.01, 0.99)
 
         #print(phigh, f3(phigh))
         #print(plow, f4(plow))
