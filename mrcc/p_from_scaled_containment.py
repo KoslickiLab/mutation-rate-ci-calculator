@@ -29,22 +29,9 @@ def compute_confidence_intervals(scaledContainmentsObserverved, L, k, confidence
 
     all_results = []
     for (CksIx,Cks) in enumerate(scaledContainmentsObserverved):
-        #Nm_guess = L*(1-Cks)
-        #sol1_mpf = newton(f1_mpf, Nm_guess)
-        #sol2_mpf = newton(f2_mpf, Nm_guess)
-		
-		#if debug:
-            #print( sol1, f1(sol1) )
-             #print( float(sol1_new), float(f1_new(float(sol1_new))) )
-             #print( float(sol1_new), float(f1(sol1_new)) )
-             #print( sol1_mpf, f1_mpf(sol1_mpf) )
-             #print( sol2, f2(sol2) )
-             #print( sol2_mpf, f2_mpf(sol2_mpf) )
-		
-		sol1_mpf = brentq(f1_mpf,0,L)
+        sol1_mpf = brentq(f1_mpf,0,L)
         sol2_mpf = brentq(f2_mpf,0,L)
 		
-
         sol1 = sol1_mpf
         sol2 = sol2_mpf
 
