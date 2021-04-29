@@ -52,8 +52,8 @@ def compute_confidence_intervals(scaledContainmentsObserverved, L, k, confidence
         #phigh = newton(f3, Clow)
         #plow = newton(f4, Chigh)
 
-        phigh = brentq(f3, 0.01, 0.99)
-        plow = brentq(f4, 0.01, 0.99)
+        phigh = brentq(f3, 0.0, 0.99)
+        plow = brentq(f4, 0.0, 0.99)
 
         #print(phigh, f3(phigh))
         #print(plow, f4(plow))
