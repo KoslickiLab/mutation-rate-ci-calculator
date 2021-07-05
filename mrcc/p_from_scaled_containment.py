@@ -2,12 +2,13 @@
 
 import sys
 from math import ceil
-import mrcc.kmer_mutation_formulas_thm5 as thm5
-import mrcc.hypergeometric_slicer as hgslicer
+import kmer_mutation_formulas_thm5 as thm5
+import hypergeometric_slicer as hgslicer
 from scipy.optimize import brentq, fsolve, newton
 from scipy.stats import norm as scipy_norm
 from numpy import sqrt
 import argparse
+import third_moment_calculator as moment_calculator
 
 try:
     from mpmath import mp as mpmath,mpf
@@ -18,6 +19,36 @@ except ModuleNotFoundError:
 
 def probit(p):
     return scipy_norm.ppf(p)
+
+def compute_confidence_interval_one_step(scaledContainmentsObserverved, L, k, confidence, s, debug=False):
+    alpha = 1 - confidence
+    z_alpha = probit(1-alpha/2)
+    
+    bias_factor = 1 - (1 - s) ** L
+    
+    term_1 = (1.0-s) / (s * L**3 * bias_factor**2)
+    term_2 = lambda pest: L * moment_calculator.exp_n_mutated(L, k, pest) - moment_calculator.exp_n_mutated_squared(L, k, pest)
+    term_3 = lambda pest: moment_calculator.var_n_mutated(L, k, pest) / (L**2)
+    
+    var_direct = lambda pest: term_1 * term_2(pest) + term_3(pest)
+    
+    f1 = lambda pest: (1-pest)**k + z_alpha * sqrt(var_direct(pest)) - Cks
+    f2 = lambda pest: (1-pest)**k - z_alpha * sqrt(var_direct(pest)) - Cks
+    
+    
+    all_results = []
+    for (CksIx,Cks) in enumerate(scaledContainmentsObserverved):
+        if Cks <= 0.0:
+            sol2 = sol1 = 1.0
+        elif Cks >= 1.0:
+            sol1 = sol2 = 0.0
+        else:
+            sol1 = brentq(f1, 0.0000001, 0.9999999)
+            sol2 = brentq(f2, 0.0000001, 0.9999999)
+        
+        values = [L,k,confidence,Cks,sol2,sol1,1.0-Cks**(1.0/k),(sol2+sol1)/2.0]
+        all_results.append(values)
+    return all_results
 
 def compute_confidence_intervals(scaledContainmentsObserverved, L, k, confidence, s, debug=False):
     alpha = 1 - confidence
@@ -96,8 +127,16 @@ def main(args):
     # compute the confidence interval(s)
     conf_intervals = compute_confidence_intervals(scaledContainmentsObserverved,kmerSequenceLength,kmerSize,confidence,scaleFactor)
 
-    #write results
+    print ("Interval using two steps:")
     header = ["L","k","conf","Cks","CLow","CHigh","pLow","pHigh"]
+    print("\t".join(header))
+    for values in conf_intervals:
+        print("\t".join(str(v)[:7] for v in values))
+        
+    conf_intervals = compute_confidence_interval_one_step(scaledContainmentsObserverved,kmerSequenceLength,kmerSize,confidence,scaleFactor)
+
+    print ("Interval using a single step:")
+    header = ["L","k","conf","Cks","pLow","pHigh","PtEst","Midpoint"]
     print("\t".join(header))
     for values in conf_intervals:
         print("\t".join(str(v)[:7] for v in values))
