@@ -1,8 +1,8 @@
 from scipy.special import hyp2f1
-from mutation_model_simulator import MutationModel
-from kmer_mutation_formulas_thm5 import exp_n_mutated, var_n_mutated
+from mrcc.mutation_model_simulator import MutationModel
+from mrcc.kmer_mutation_formulas_thm5 import exp_n_mutated, var_n_mutated
 from matplotlib import pyplot as plt
-import kmer_mutation_formulas_thm5 as thm5
+import mrcc.kmer_mutation_formulas_thm5 as thm5
 
 def var_c_scaled_first_order_taylor(L,k,p,s):
     q = 1 - (1 - p) ** k
@@ -30,8 +30,8 @@ def third_moment_nmut_exact(L,k,p):
     t2 = (-2 + 2 * k - L) * (-1 + 2 * k - L) * (2 * k - L) * (-1 + (1 - p)**k)**3
     t3 = (1/(p**3))*(-6 * (-1 + k)**2 * (k - L) * p**3 + 6 * (1 - p)**(3 * k) * (2 + (-2 + 2 * k - L) * p) + (1 - p)**(2 * k) * (-12 + 6 * (2 * k + L) * p + 6 * (4 * k**2 + 2 * (1 + L) - 3 * k * (2 + L)) * p**2 - (-1 + k) * k * (-2 + 4 * k - 3 * L) * p**3) + 6 * (-1 + k) * (1 - p)**k * p * (-2 + p * (2 - k + 2 * L + (k * (-2 + 3 * k - 3 * L) + L) * p)))
     t4 = 6 * (-1 + (1 - p)**k) * ((k + k**2 - 2 * k * L + (-1 + L) * L) * (-1 + 2 * (1 - p)**k) * hyp2f1(1, 2 + k - L, k - L, 1) + (k + k**2 - 2 * k * L + (-1 + L) * L) * (1 - p)**k * (-1 + p) * hyp2f1(1, 2 + k - L, k - L, 1 - p) - (-2 * k + 4 * k**2 + L - 4 * k * L + L**2) * ((-1 + 2 * (1 - p)**k) * hyp2f1(1, 1 + 2 * k - L, -1 + 2 * k - L, 1)- (-1 + p)**(2 * k) * hyp2f1(1, 1 + 2 * k - L, -1 + 2 * k - L, 1 - p)))
-    return t1+t2+t3+t4    
-    
+    return t1+t2+t3+t4
+
 def exp_n_mutated_squared(L, k, p):
     return var_n_mutated(L, k, p) + exp_n_mutated(L, k, p) ** 2
 
@@ -102,12 +102,12 @@ if __name__=='__main__':
     conf = 0.95
     scale_factor = 0.1
     mutation_rate = 0.03
-    
+
     print(var_c_scaled_one_step(L, k, mutation_rate, scale_factor, conf))
     print(var_test(L, k, mutation_rate, scale_factor, conf))
     print(var_c_scaled_first_order_taylor(L, k, mutation_rate, scale_factor))
-    
-    
+
+
     '''
     kmerSequenceLengthLow = 100
     kmerSequenceLengthHigh = 1000000
@@ -115,19 +115,19 @@ if __name__=='__main__':
     kmerSize = 21
     pSubstitution = 0.05
     numIterations = 10000
-    
+
     stats = generate_third_moment_stats(kmerSequenceLengthLow,kmerSequenceLengthHigh,
                                         stepSize,kmerSize,pSubstitution,False)
     plt.plot([x[0] for x in stats], [x[1] for x in stats])
     plt.plot([x[0] for x in stats], [x[2] for x in stats])
     plt.show()
-    
+
     plt.plot([x[0] for x in stats], [ 100*abs(x[1]-x[2])/x[1] for x in stats ])
     plt.show()
-    
+
     stats_fourth_moment = generate_fourth_moment_stats(kmerSequenceLengthLow,kmerSequenceLengthHigh,
                                         stepSize,kmerSize,pSubstitution, numIterations)
     plt.plot([x[0] for x in stats_fourth_moment], [ 100*abs(x[1]-x[2])/x[1] for x in stats_fourth_moment ])
     plt.show()
     '''
-    
+
