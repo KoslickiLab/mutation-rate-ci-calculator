@@ -2,15 +2,16 @@
 
 import sys
 from math import ceil
-import kmer_mutation_formulas_thm5 as thm5
-import hypergeometric_slicer as hgslicer
+import mrcc.kmer_mutation_formulas_thm5 as thm5
+import mrcc.hypergeometric_slicer as hgslicer
 from scipy.optimize import brentq, fsolve, newton
 from scipy.stats import norm as scipy_norm
 from numpy import sqrt
 import argparse
 from third_moment_calculator import *
 from matplotlib import pyplot as plt
-import third_moment_calculator as third
+import mrcc.third_moment_calculator as third
+
 
 try:
     from mpmath import mp as mpmath,mpf
@@ -28,34 +29,34 @@ def variance_scaled_jaccard(L, p, k, s):
     exp_n_mut_squared = third.exp_n_mutated_squared(L, k, p)
     exp_n_mut_cubed = third.exp_n_mutated_cubed(L, k, p)
     bias_factor = 1 - (1 - s) ** ( int(L + exp_n_mut) )
-    
+
     factor1 = (1-s)/(s * bias_factor**2)
     factor2 = (2 * L * exp_n_mut - 2 * exp_n_mut_squared) / (L ** 3 + 3*L*exp_n_mut_squared + 3*L*L*exp_n_mut + exp_n_mut_cubed)
     term1 = factor1 * factor2
     term2 = (L**2 - 2 * L * exp_n_mut + exp_n_mut_squared) / (L**2 + 2 * L * exp_n_mut + exp_n_mut_squared)
     term3 = ((L - exp_n_mut) / (L + exp_n_mut))**2
-    
+
     return term1 + term2 - term3
 
 
 def compute_confidence_interval_two_step(scaledJaccardsObserverved, L, k, confidence, s, debug=False):
     alpha = 1 - confidence
     z_alpha = probit(1-alpha/2)
-    
+
     var = lambda N_mut : 2 * N_mut * (L - N_mut) * (1-s) / ( (L + N_mut)**3 * s )
-    
+
     all_results = []
     for (JIx,Js) in enumerate(scaledJaccardsObserverved):
         print (Js)
-        
+
         f1 = lambda N_mut: 1.0*(L - N_mut) / (L + N_mut) + z_alpha * sqrt( var(N_mut) )
         f2 = lambda N_mut: 1.0*(L - N_mut) / (L + N_mut) - z_alpha * sqrt( var(N_mut) )
-        
+
         sol1 = brentq(f1, 1, L - 1)
         sol2 = brentq(f2, 1, L - 1)
-        
+
         print (sol1, sol2)
-        
+
         #values = [L,k,confidence,Js, sol2, sol1, 1.0 - (2.0 - 2.0/(Js + 1))**(1.0/k)]
         #all_results.append(values)
     return all_results
@@ -63,13 +64,13 @@ def compute_confidence_interval_two_step(scaledJaccardsObserverved, L, k, confid
 def compute_confidence_interval_one_step(scaledJaccardsObserverved, L, k, confidence, s, debug=False):
     alpha = 1 - confidence
     z_alpha = probit(1-alpha/2)
-    
+
     var_direct = lambda pest: variance_scaled_jaccard(L, pest, k, s)
-        
+
     f1 = lambda pest: 2.0/(2- (1-pest)**k ) - 1 + z_alpha * sqrt(var_direct(pest)) - Js
     f2 = lambda pest: 2.0/(2- (1-pest)**k ) - 1 - z_alpha * sqrt(var_direct(pest)) - Js
-    
-    
+
+
     all_results = []
     for (JIx,Js) in enumerate(scaledJaccardsObserverved):
         #print (Js)
@@ -82,10 +83,10 @@ def compute_confidence_interval_one_step(scaledJaccardsObserverved, L, k, confid
             #sol2 = brentq(f2, max(1.0 - (2.0 - 2.0/(Js + 1))**(1.0/k) - 0.05, 0.001), min(1.0 - (2.0 - 2.0/(Js + 1))**(1.0/k) + 0.05,0.9999))
             sol1 = brentq(f1, 0.0001, 0.9999)
             sol2 = brentq(f2, 0.0001, 0.9999)
-        
+
         #print (var_direct(sol1))
         #print (var_direct(sol2))
-        
+
         values = [L,k,confidence,Js, sol2, sol1, 1.0 - (2.0 - 2.0/(Js + 1))**(1.0/k)]
         all_results.append(values)
     return all_results
@@ -141,7 +142,7 @@ def main(args):
     print("\t".join(header))
     for values in conf_intervals:
         print("\t".join(str(v)[:7] for v in values))
-        
+
 
 # parse_probability--
 #    Parse a string as a probability
