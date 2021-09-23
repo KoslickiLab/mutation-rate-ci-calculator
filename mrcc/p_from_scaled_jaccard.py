@@ -8,7 +8,6 @@ from scipy.optimize import brentq, fsolve, newton
 from scipy.stats import norm as scipy_norm
 from numpy import sqrt
 import argparse
-from third_moment_calculator import *
 from matplotlib import pyplot as plt
 import mrcc.third_moment_calculator as third
 
