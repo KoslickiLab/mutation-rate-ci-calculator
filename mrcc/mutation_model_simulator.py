@@ -42,7 +42,7 @@ Example 2:
 
 from sys    import argv,stdin,stdout,stderr,exit
 from random import Random
-from hypergeometric_slicer import q_to_r1,q_to_jaccard,jaccard_to_r1,jaccard_to_q
+from mrcc.hypergeometric_slicer import q_to_r1,q_to_jaccard,jaccard_to_r1,jaccard_to_q
 
 try:
 	from numpy.random import RandomState
